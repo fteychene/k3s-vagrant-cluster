@@ -1,6 +1,6 @@
-# K3S Vargant cluster 
+# K3S Vagrant cluster 
 
-Kubernetes cluster based on vagrant VMs.
+Kubernetes K3S cluster based on vagrant VMs.
 
 The cluster is composed of 1 master and 3 nodes.
 Will be installed :
@@ -28,8 +28,11 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook --inventory-file=inventory/vagr
 
 ## Access the cluster
 
-The VMs are configured with these IPs :
- - kubemaster - 192.1268.10.10
- - kubenode1 - 192.1268.10.11
- - kubenode2 - 192.1268.10.12
- - kubenode3 - 192.1268.10.13
+The VMs are configured with these IPs
+
+Hostname | IP 
+--- | ---
+kubemaster | 192.168.10.10
+kubenode1 | 192.168.10.11
+kubenode2 | 192.168.10.12
+kubenode3 | 192.168.10.13
