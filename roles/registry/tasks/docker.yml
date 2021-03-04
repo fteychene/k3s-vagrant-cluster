@@ -1,0 +1,33 @@
+- name: Check that docker binary exists
+  shell: command -v docker >/dev/null 2>&1
+  register: is_docker_exist
+  ignore_errors: yes
+
+- debug:
+    msg: "Docker => {{ is_docker_exist.rc }}"
+
+- name: Install required system packages
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip']
+  when: is_docker_exist.rc != 0
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: is_docker_exist.rc != 0
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu groovy stable
+    state: present
+  when: is_docker_exist.rc != 0
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+  when: is_docker_exist.rc != 0
+      
+- name: Update apt and install docker-ce
+  apt: update_cache=yes name=docker-ce state=latest
+  when: is_docker_exist.rc != 0

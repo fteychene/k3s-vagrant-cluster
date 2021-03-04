@@ -1,0 +1,28 @@
+- name: Download k3s installer
+  get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s_install.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensures /etc/rancher/k3s/ dir exists
+  file: path=/etc/rancher/k3s/ state=directory
+
+- name: Push registries
+  register: private_registry
+  template:
+    src: "registries.yaml"
+    dest: "/etc/rancher/k3s/registries.yaml"
+    owner: root
+    group: root
+    mode: 0755
+  
+- name: Check that server token exists
+  stat:
+    path: /var/lib/rancher/k3s/server/token
+  register: token_exists
+
+- name: Prvate ip
+  shell: /sbin/ip -o -4 addr list enp0s8 | awk '{print $4}' | cut -d/ -f1
+  register: current_ip

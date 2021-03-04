@@ -1,0 +1,7 @@
+- hosts: master
+  become: yes
+  become_method: sudo
+  roles:
+    - ghost
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml

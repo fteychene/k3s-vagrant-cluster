@@ -1,0 +1,4 @@
+mirrors:
+  kubemaster:
+    endpoint:
+      - "http://kubemaster:5000"

@@ -1,0 +1,7 @@
+- name: Include k3s common
+  include_role:
+    name: k3s/common
+
+- name: Install k3s agent
+  shell: INSTALL_K3S_EXEC="agent --server https://{{ master_ip }}:6443 --token {{ hostvars[groups['master'][0]]['k3stoken'] }} --flannel-iface enp0s8  --node-ip {{ current_ip.stdout_lines[0] }}" /tmp/k3s_install.sh
+  when: not token_exists.stat.exists

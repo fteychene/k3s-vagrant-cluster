@@ -1,0 +1,23 @@
+# - name: Update OS
+#   package:
+#     name: '*'
+#     state: latest
+
+# - name: Copy private ssh key
+#   copy:
+#     src: .ssh/id_rsa
+#     dest: /root/.ssh/id_rsa
+#     owner: root
+#     group: root
+#     mode: '0400'
+
+# - name: Copy public ssh key
+#   copy:
+#     src: .ssh/id_rsa.pub
+#     dest: /root/.ssh/authorized_keys
+#     owner: root
+#     group: root
+#     mode: '0400'
+
+- name: Add hostname to hosts
+  shell: echo "127.0.1.1 $(hostname)" >> /etc/hosts

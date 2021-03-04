@@ -1,0 +1,34 @@
+- name: Traefik helm release stat
+  community.kubernetes.helm_info:
+    name: traefik
+    release_namespace: kube-system
+  register: traefik_stat
+
+- name: Install traefik
+  # shell: helm --namespace=traefik upgrade -i --reset-values --wait --create-namespace traefik traefik/traefik
+  community.kubernetes.helm:
+    name: traefik
+    chart_ref: traefik/traefik
+    release_namespace: kube-system
+    wait: yes
+  when: traefik_stat.status is not defined
+
+- name: Add traefik ingress
+  community.kubernetes.k8s:
+    state: present
+    apply: yes
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRoute
+      metadata:
+        name: ingress-traefik-dashboard
+        namespace: kube-system
+      spec:
+        entryPoints:
+          - web
+        routes:
+          - match: Host(`traefik.dash`)
+            kind: Rule
+            services:
+              - name: api@internal
+                kind: TraefikService

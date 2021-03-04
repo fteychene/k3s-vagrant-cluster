@@ -1,0 +1,79 @@
+- name: Include k3s common
+  include_role:
+    name: k3s/common
+
+# Test --node-external-ip for generating kubeconf with it
+- name: Install k3s
+  shell: INSTALL_K3S_EXEC="server --cluster-init --tls-san $(hostname) --no-deploy=traefik --advertise-address={{ master_ip }} --flannel-iface enp0s8 --node-ip={{ master_ip }}" /tmp/k3s_install.sh
+  when: not token_exists.stat.exists
+
+- name: Read node-token from master
+  slurp:
+    src: /var/lib/rancher/k3s/server/token
+  register: node_token
+
+- name: Store Master node-token
+  set_fact:
+    k3stoken: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+- name: Check that helm binary exists
+  shell: command -v helm >/dev/null 2>&1
+  register: is_helm_exist
+  ignore_errors: yes
+
+- name: Ensure k3s is in a running state
+  service:
+    name: k3s 
+    state: started
+  register: myserviceDetails
+  until: myserviceDetails.status.ActiveState == "active"
+  retries: 15
+  delay: 20
+
+- name: Install requirements for kube ansible
+  pip:
+    name:
+      - pyhelm
+      - grpcio
+      - PyYAML
+      - openshift
+  when: is_helm_exist.rc != 0
+
+- name: Helm install script
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+    dest: /tmp/helm.sh
+    owner: root
+    group: root
+    mode: 0700
+  when: is_helm_exist.rc != 0
+
+- name: Helm install
+  shell: /tmp/helm.sh
+  when: is_helm_exist.rc != 0
+
+- name: Add traefik chart repo
+  community.kubernetes.helm_repository:
+    name: traefik
+    repo_url: "https://helm.traefik.io/traefik"
+  when: is_helm_exist.rc != 0
+
+- name: Workaround kubeclient python error
+  pip:
+    name:
+     - kubernetes==11.0.0
+    state: forcereinstall
+
+- name: Kubeconfig edit
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /etc/rancher/k3s/k3s-external.yaml
+    remote_src: yes
+
+- name: Edit config
+  shell: sed -i 's/127.0.0.1/{{ master_ip }}/g' /etc/rancher/k3s/k3s-external.yaml
+  
+- name: Fetch kubeconfig 
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s-external.yaml
+    dest: fetched
