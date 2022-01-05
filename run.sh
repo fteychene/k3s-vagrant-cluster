@@ -43,10 +43,12 @@ ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook --inventory-file=inventory/vagr
 msg "${NOFORMAT}Install ghost helm chart in cluster"
 ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook --inventory-file=inventory/vagrant/hosts.ini ghost.yml
 
-msg "${GREEN} Installation successful"
+msg "${GREEN}Installation successful"
+msg
 msg "${CYAN}Add to /etc/hosts"
 msg "${CYAN}192.168.10.10 traefik.dash"
 msg "${CYAN}192.168.10.10 ghost.kube"
+msg "${CYAN}192.168.10.10 kubemaster"
 msg
-msg "${CYAN}Kube config is available in => fetched/kubemaster/etc/rancher/k3s/k3s-external.yaml"
-msg "${CYAN}export KUBECONFIG=fetched/kubemaster/etc/rancher/k3s/k3s-external.yaml to use the cluster"
+msg "${CYAN}Kube config is available in => $(pwd)/fetched/kubemaster/etc/rancher/k3s/k3s-external.yaml"
+msg "${CYAN}export KUBECONFIG=$(pwd)/fetched/kubemaster/etc/rancher/k3s/k3s-external.yaml to use the cluster"

@@ -23,6 +23,6 @@
     path: /var/lib/rancher/k3s/server/token
   register: token_exists
 
-- name: Prvate ip
+- name: Private ip
   shell: /sbin/ip -o -4 addr list enp0s8 | awk '{print $4}' | cut -d/ -f1
   register: current_ip

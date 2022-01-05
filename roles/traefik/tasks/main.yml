@@ -1,12 +1,12 @@
 - name: Traefik helm release stat
-  community.kubernetes.helm_info:
+  kubernetes.core.helm_info:
     name: traefik
     release_namespace: kube-system
   register: traefik_stat
 
 - name: Install traefik
   # shell: helm --namespace=traefik upgrade -i --reset-values --wait --create-namespace traefik traefik/traefik
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: traefik
     chart_ref: traefik/traefik
     release_namespace: kube-system
@@ -14,7 +14,7 @@
   when: traefik_stat.status is not defined
 
 - name: Add traefik ingress
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     apply: yes
     definition:

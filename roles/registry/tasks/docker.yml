@@ -8,7 +8,7 @@
 
 - name: Install required system packages
   apt: name={{ item }} state=latest update_cache=yes
-  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip']
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'gnupg' ]
   when: is_docker_exist.rc != 0
 
 - name: Add Docker GPG apt Key
@@ -19,7 +19,7 @@
 
 - name: Add Docker Repository
   apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu groovy stable
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
     state: present
   when: is_docker_exist.rc != 0
 
@@ -28,6 +28,7 @@
     name: docker
   when: is_docker_exist.rc != 0
       
-- name: Update apt and install docker-ce
-  apt: update_cache=yes name=docker-ce state=latest
+- name: Update apt and install docker
+  apt: update_cache=yes name={{ item }} state=latest
+  loop: [ 'docker-ce', 'docker-ce-cli', 'containerd.io' ]
   when: is_docker_exist.rc != 0

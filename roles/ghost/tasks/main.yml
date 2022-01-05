@@ -1,18 +1,17 @@
 - name: Add cetic chart repo
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: cetic
     repo_url: "https://cetic.github.io/helm-charts"
 
 - name: Ghost helm release stat
-  community.kubernetes.helm_info:
+  kubernetes.core.helm_info:
     name: ghost
     release_namespace: ghost
   register: ghost_stat
 
-
 - name: Install ghost helm release
   # shell: helm --namespace=traefik upgrade -i --reset-values --wait --create-namespace traefik traefik/traefik
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: ghost
     chart_ref: cetic/microservice
     release_namespace: ghost
@@ -21,7 +20,7 @@
   when: ghost_stat.status is not defined
 
 - name: Add ghost ingress
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     apply: yes
     definition:
